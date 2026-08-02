@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sala 2 — Galerías virtuales · Gallery24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero-room{ padding:170px 0 40px; }
+  .breadcrumb{ margin-bottom:22px; }
+  .breadcrumb a{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--wine); text-decoration:none; }
+  .breadcrumb a:hover{ text-decoration:underline; }
+  .hero-room h1{ font-size:clamp(2.1rem, 4.4vw, 3.4rem); max-width:16ch; }
+  .hero-room h1 em{ font-style:italic; color:var(--wine); }
+  .hero-room p{ max-width:52ch; margin-top:18px; color:var(--ink-soft); font-size:1.02rem; }
+
+  .room{
+    position:relative; border-radius:48px;
+    background: radial-gradient(120% 60% at 50% -10%, rgba(201,164,79,0.14), transparent 60%), linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 60%, #EFEBE0 100%);
+    padding:70px 40px 46px; overflow:hidden;
+  }
+  .light-arc{ position:absolute; top:0; left:0; right:0; height:140px; }
+  .frames{ position:relative; z-index:2; display:flex; justify-content:center; align-items:flex-end; gap:30px; min-height:300px; flex-wrap:wrap; }
+  .frame{
+    position:relative; background:#fff; padding:14px;
+    border-radius:52% 48% 55% 45% / 58% 55% 45% 42%;
+    box-shadow:0 26px 44px -20px rgba(33,29,25,0.35);
+    transition:transform .4s ease, opacity .4s ease; cursor:pointer;
+  }
+  .frame img{ width:120px; height:150px; object-fit:cover; border-radius:52% 48% 55% 45% / 58% 55% 45% 42%; }
+  .frame.is-featured{ transform:translateY(-16px) scale(1.5); z-index:3; }
+  .frame.is-featured img{ width:150px; height:190px; }
+  .frame:not(.is-featured){ opacity:0.7; }
+  .frame:not(.is-featured):hover{ opacity:1; }
+
+  .info-card{
+    position:relative; z-index:3; margin-top:40px;
+    background:#fff; border-radius:32px; padding:26px 30px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+    box-shadow:0 20px 40px -26px rgba(33,29,25,0.3);
+  }
+  .info-card .frame-title{ font-family:'Fraunces', serif; font-style:italic; font-size:1.2rem; }
+  .info-card dl{ display:flex; gap:26px; flex-wrap:wrap; }
+  .info-card dt{ font-family:'IBM Plex Mono', monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); }
+  .info-card dd{ font-size:0.92rem; margin-top:2px; }
+
+  .filmstrip{ display:flex; gap:12px; margin-top:26px; justify-content:center; flex-wrap:wrap; }
+  .film-thumb{ width:54px; height:54px; border-radius:50%; overflow:hidden; border:3px solid transparent; cursor:pointer; opacity:0.6; transition:opacity .2s ease, border-color .2s ease; }
+  .film-thumb img{ width:100%; height:100%; object-fit:cover; }
+  .film-thumb.active, .film-thumb:hover{ opacity:1; border-color:var(--wine); }
+
+  .cta-row{ display:flex; gap:16px; margin-top:44px; flex-wrap:wrap; justify-content:center; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-mark" href="inicio.html">Gallery24</a>
+  <div class="nav-links">
+    <a href="inicio.html#recorrido">Recorrido</a>
+    <a href="index.html">Iniciar sesión</a>
+  </div>
+</nav>
+
+<header class="hero-room wrap">
+  <div class="breadcrumb"><a href="inicio.html#recorrido">← Volver al recorrido</a></div>
+  <span class="section-num">Sala 02</span>
+  <h1 style="margin-top:14px;">Recorre la obra <em>completa</em> de un artista.</h1>
+  <p>Cada galería virtual reúne el catálogo de un artista o de una exposición: ficha técnica, descripción y precio de cada pieza, exactamente como si caminaras por la sala.</p>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="room reveal">
+      <svg class="light-arc" viewBox="0 0 800 140" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse cx="120" cy="42" rx="150" ry="90" fill="rgba(255,244,214,0.5)"></ellipse>
+        <ellipse cx="400" cy="34" rx="150" ry="90" fill="rgba(255,244,214,0.5)"></ellipse>
+        <ellipse cx="680" cy="42" rx="150" ry="90" fill="rgba(255,244,214,0.5)"></ellipse>
+      </svg>
+
+      <div class="frames" id="frames">
+        <div class="frame" data-img="11" data-title="Cartagena Eterna" data-tec="Óleo sobre lienzo" data-dim="80 × 100 cm" data-precio="$1.200.000 COP">
+          <img src="https://picsum.photos/300/380?11" alt="Cartagena Eterna">
+        </div>
+        <div class="frame is-featured" data-img="23" data-title="Muralla al atardecer" data-tec="Óleo sobre lienzo" data-dim="60 × 90 cm" data-precio="$980.000 COP">
+          <img src="https://picsum.photos/300/380?23" alt="Muralla al atardecer">
+        </div>
+        <div class="frame" data-img="45" data-title="Costa Adentro" data-tec="Acrílico sobre tela" data-dim="70 × 100 cm" data-precio="$1.450.000 COP">
+          <img src="https://picsum.photos/300/380?45" alt="Costa Adentro">
+        </div>
+        <div class="frame" data-img="67" data-title="Raíces" data-tec="Técnica mixta" data-dim="50 × 70 cm" data-precio="$760.000 COP">
+          <img src="https://picsum.photos/300/380?67" alt="Raíces">
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div>
+          <span class="mono" style="color:var(--wine);">Camila Restrepo</span>
+          <div class="frame-title" id="capTitle">Muralla al atardecer</div>
+        </div>
+        <dl>
+          <div><dt>Técnica</dt><dd id="capTec">Óleo sobre lienzo</dd></div>
+          <div><dt>Dimensiones</dt><dd id="capDim">60 × 90 cm</dd></div>
+          <div><dt>Precio</dt><dd id="capPrecio">$980.000 COP</dd></div>
+        </dl>
+      </div>
+
+      <div class="filmstrip" id="filmstrip">
+        <div class="film-thumb" data-target="0"><img src="https://picsum.photos/120/150?11" alt=""></div>
+        <div class="film-thumb active" data-target="1"><img src="https://picsum.photos/120/150?23" alt=""></div>
+        <div class="film-thumb" data-target="2"><img src="https://picsum.photos/120/150?45" alt=""></div>
+        <div class="film-thumb" data-target="3"><img src="https://picsum.photos/120/150?67" alt=""></div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="sala-4-marketplace.html">Comprar esta obra →</a>
+      <a class="btn btn-ghost" href="sala-1-perfil.html">Ver perfil de la artista</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="nav-mark" style="font-size:1rem;">Gallery24</span>
+    <span class="mono">El arte sin fronteras — Latinoamérica, 2026</span>
+  </div>
+</footer>
+
+<script>
+  const frames = document.querySelectorAll('#frames .frame');
+  const thumbs = document.querySelectorAll('#filmstrip .film-thumb');
+  const capTitle = document.getElementById('capTitle');
+  const capTec = document.getElementById('capTec');
+  const capDim = document.getElementById('capDim');
+  const capPrecio = document.getElementById('capPrecio');
+
+  function setFeatured(index){
+    frames.forEach((f, i) => f.classList.toggle('is-featured', i === index));
+    thumbs.forEach((t, i) => t.classList.toggle('active', i === index));
+    const f = frames[index];
+    capTitle.textContent = f.dataset.title;
+    capTec.textContent = f.dataset.tec;
+    capDim.textContent = f.dataset.dim;
+    capPrecio.textContent = f.dataset.precio;
+  }
+  frames.forEach((f, i) => f.addEventListener('click', () => setFeatured(i)));
+  thumbs.forEach((t) => t.addEventListener('click', () => setFeatured(parseInt(t.dataset.target, 10))));
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); } });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
