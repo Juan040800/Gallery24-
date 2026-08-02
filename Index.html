@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — Gallery24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  main{ min-height:100vh; display:grid; grid-template-columns:1.05fr 1fr; align-items:stretch; }
+  @media (max-width:920px){ main{ grid-template-columns:1fr; } }
+
+  .scene{ position:relative; padding:170px 60px 60px; display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
+  .scene::before{ content:""; position:absolute; top:-140px; left:-160px; width:520px; height:520px; background:radial-gradient(circle, rgba(110,31,62,0.12), transparent 65%); border-radius:50%; }
+  .scene-eyebrow{ display:flex; align-items:center; gap:10px; margin-bottom:22px; position:relative; z-index:1;}
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--wine); box-shadow:0 0 0 4px rgba(110,31,62,0.14); }
+  .scene-eyebrow .mono{ color:var(--wine); }
+  .scene h1{ position:relative; z-index:1; font-size:clamp(2rem, 3.6vw, 3rem); max-width:13ch; line-height:1.08; }
+  .scene h1 em{ font-style:italic; color:var(--wine); }
+  .scene p{ position:relative; z-index:1; max-width:38ch; margin-top:20px; color:var(--ink-soft); font-size:1rem; }
+  .scene-links{ position:relative; z-index:1; margin-top:30px; }
+  .scene-links a{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--wine); text-decoration:none; }
+  .scene-links a:hover{ text-decoration:underline; }
+
+  .cluster{ position:relative; z-index:1; display:flex; gap:22px; margin-top:56px; flex-wrap:wrap; }
+  .blob-img{ width:150px; height:190px; box-shadow:0 24px 44px -22px rgba(33,29,25,0.35); }
+  .blob-img:nth-child(1){ border-radius:58% 42% 63% 37% / 45% 53% 47% 55%; transform:translateY(18px) rotate(-2deg); }
+  .blob-img:nth-child(2){ border-radius:38% 62% 41% 59% / 60% 41% 59% 40%; }
+  .blob-img:nth-child(3){ border-radius:62% 38% 55% 45% / 40% 62% 38% 60%; transform:translateY(32px) rotate(1.5deg); }
+  .blob-img img{ width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+  @media (max-width:920px){ .scene{ padding:160px 32px 40px; } .cluster{display:none;} }
+
+  .panel{ background:var(--paper); display:flex; align-items:center; justify-content:center; padding:170px 48px 60px; }
+  .card{ width:100%; max-width:400px; }
+  .card .mono{ color:var(--wine); }
+  .card h2{ font-size:1.7rem; margin-top:12px; margin-bottom:8px; }
+  .card .card-sub{ color:var(--ink-soft); font-size:0.92rem; margin-bottom:36px; }
+
+  .field{ margin-bottom:20px; }
+  .field label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:8px; }
+  .field input{ width:100%; padding:15px 20px; border:1px solid var(--line); border-radius:999px; background:#fff; font-family:'Inter', sans-serif; font-size:0.95rem; color:var(--ink); outline:none; transition:border-color .2s ease, box-shadow .2s ease; }
+  .field input:focus{ border-color:var(--wine); box-shadow:0 0 0 4px rgba(110,31,62,0.1); }
+  .field input::placeholder{ color:rgba(33,29,25,0.32); }
+
+  .row-between{ display:flex; justify-content:space-between; align-items:center; margin:-6px 0 28px; flex-wrap:wrap; gap:10px; }
+  .checkline{ display:flex; align-items:center; gap:8px; font-size:0.85rem; color:var(--ink-soft); }
+  .checkline input{ accent-color:var(--wine); }
+  .link-muted{ font-size:0.85rem; color:var(--wine); text-decoration:none; }
+  .link-muted:hover{ text-decoration:underline; }
+
+  .btn-full{ width:100%; justify-content:center; }
+
+  .divider{ display:flex; align-items:center; gap:14px; margin:30px 0; }
+  .divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .divider span{ font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.1em; }
+
+  .btn-alt{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; padding:15px 26px; border-radius:999px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:10px; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; transition:all .25s ease; margin-bottom:12px; }
+  .btn-alt:hover{ border-color:var(--wine); color:var(--wine); }
+
+  .card-foot{ margin-top:34px; text-align:center; font-size:0.9rem; color:var(--ink-soft); }
+  .card-foot a{ color:var(--wine); text-decoration:none; font-weight:600; }
+  .card-foot a:hover{ text-decoration:underline; }
+
+  .error{ display:none; background:#F7E9EE; color:var(--wine-deep); border-radius:16px; padding:12px 18px; font-size:0.85rem; margin-bottom:20px; }
+  .error.show{ display:block; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-mark">Gallery24</span>
+  <div class="nav-links">
+    <a href="inicio.html">Explorar sin cuenta</a>
+    <a href="registro.html" class="nav-cta">Crear cuenta</a>
+  </div>
+</nav>
+
+<main>
+  <section class="scene">
+    <div class="scene-eyebrow">
+      <span class="dot"></span>
+      <span class="mono">Acceso a la sala</span>
+    </div>
+    <h1>El museo te<br>reconoce al <em>entrar</em>.</h1>
+    <p>Inicia sesión para ver tus obras guardadas, seguir a tus artistas favoritos y continuar el recorrido donde lo dejaste.</p>
+    <div class="scene-links">
+      <a href="inicio.html">Prefiero explorar primero, sin cuenta →</a>
+    </div>
+
+    <div class="cluster" aria-hidden="true">
+      <div class="blob-img"><img src="https://picsum.photos/300/380?11" alt=""></div>
+      <div class="blob-img"><img src="https://picsum.photos/300/380?22" alt=""></div>
+      <div class="blob-img"><img src="https://picsum.photos/300/380?33" alt=""></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="card">
+      <span class="mono">Bienvenido de nuevo</span>
+      <h2>Iniciar sesión</h2>
+      <p class="card-sub">Accede a tu cuenta de Gallery24.</p>
+
+      <div class="error" id="formError">Revisa tu correo y contraseña e inténtalo de nuevo.</div>
+
+      <button type="button" class="btn-alt">Continuar con Google</button>
+
+      <div class="divider"><span>o con tu correo</span></div>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <div class="row-between">
+          <label class="checkline"><input type="checkbox" name="remember"> Recordarme</label>
+          <a class="link-muted" href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Entrar a la sala →</button>
+      </form>
+
+      <p class="card-foot">¿No tienes cuenta? <a href="registro.html">Regístrate en Gallery24</a></p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const form = document.getElementById('loginForm');
+  const error = document.getElementById('formError');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if (!email || !password) {
+      error.classList.add('show');
+      return;
+    }
+    error.classList.remove('show');
+    // Autenticación real pendiente para la Fase 2 (base de datos / backend).
+    // Por ahora, simula el ingreso y lleva a la galería principal.
+    window.location.href = 'inicio.html';
+  });
+</script>
+
+</body>
+  </html>
+
