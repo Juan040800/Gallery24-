@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sala 4 — Marketplace · Gallery24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero-room{ padding:170px 0 40px; }
+  .breadcrumb{ margin-bottom:22px; }
+  .breadcrumb a{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--wine); text-decoration:none; }
+  .breadcrumb a:hover{ text-decoration:underline; }
+  .hero-room h1{ font-size:clamp(2.1rem, 4.4vw, 3.4rem); max-width:16ch; }
+  .hero-room h1 em{ font-style:italic; color:var(--wine); }
+  .hero-room p{ max-width:52ch; margin-top:18px; color:var(--ink-soft); font-size:1.02rem; }
+
+  .filters{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:40px; }
+  .filters .chip{ cursor:pointer; border:1px solid transparent; }
+  .filters .chip.active{ background:var(--wine); color:var(--paper); }
+
+  .market-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:22px; }
+  @media (max-width:980px){ .market-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .market-grid{ grid-template-columns:1fr; } }
+
+  .product{ background:var(--paper); border-radius:32px; overflow:hidden; box-shadow:0 18px 36px -22px rgba(33,29,25,0.28); transition:transform .3s ease; }
+  .product:hover{ transform:translateY(-4px); }
+  .product img{ width:100%; height:220px; object-fit:cover; }
+  .product .body{ padding:18px 20px 22px; }
+  .product .artist{ font-family:'IBM Plex Mono', monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); }
+  .product .title{ font-family:'Fraunces', serif; font-style:italic; font-size:1.05rem; margin-top:4px; }
+  .product .price-row{ display:flex; justify-content:space-between; align-items:center; margin-top:14px; }
+  .product .price{ font-family:'Fraunces', serif; font-size:1.1rem; }
+  .product .buy{
+    font-family:'IBM Plex Mono', monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.06em;
+    background:var(--wine); color:var(--paper); padding:8px 14px; border-radius:999px; border:none; cursor:pointer;
+  }
+  .product .buy:hover{ background:var(--wine-deep); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-mark" href="inicio.html">Gallery24</a>
+  <div class="nav-links">
+    <a href="inicio.html#recorrido">Recorrido</a>
+    <a href="index.html">Iniciar sesión</a>
+  </div>
+</nav>
+
+<header class="hero-room wrap">
+  <div class="breadcrumb"><a href="inicio.html#recorrido">← Volver al recorrido</a></div>
+  <span class="section-num">Sala 04</span>
+  <h1 style="margin-top:14px;">Del muro <em>a tu casa</em>, sin intermediarios.</h1>
+  <p>Compra directa entre artista y coleccionista. Gallery24 solo cobra una comisión transparente por transacción — el resto es para quien creó la obra.</p>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="filters reveal">
+      <span class="chip active">Todas</span>
+      <span class="chip">Pintura</span>
+      <span class="chip">Fotografía</span>
+      <span class="chip">Escultura</span>
+      <span class="chip">Arte digital</span>
+      <span class="chip">Menos de $1.000.000</span>
+    </div>
+
+    <div class="market-grid reveal">
+      <div class="product">
+        <img src="https://picsum.photos/300/340?11" alt="Cartagena Eterna">
+        <div class="body">
+          <div class="artist">Camila Restrepo</div>
+          <div class="title">Cartagena Eterna</div>
+          <div class="price-row"><span class="price">$1.200.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?22" alt="Lo que Permanece">
+        <div class="body">
+          <div class="artist">Julián Ortega</div>
+          <div class="title">Lo que Permanece</div>
+          <div class="price-row"><span class="price">$890.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?33" alt="Raíces">
+        <div class="body">
+          <div class="artist">Mariana Duque</div>
+          <div class="title">Raíces</div>
+          <div class="price-row"><span class="price">$760.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?44" alt="Mural Urbano">
+        <div class="body">
+          <div class="artist">Esteban Ríos</div>
+          <div class="title">Mural Urbano</div>
+          <div class="price-row"><span class="price">$650.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?55" alt="Costa Adentro">
+        <div class="body">
+          <div class="artist">Camila Restrepo</div>
+          <div class="title">Costa Adentro</div>
+          <div class="price-row"><span class="price">$1.450.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?66" alt="Retrato Silente">
+        <div class="body">
+          <div class="artist">Daniela Cano</div>
+          <div class="title">Retrato Silente</div>
+          <div class="price-row"><span class="price">$540.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?77" alt="Territorio">
+        <div class="body">
+          <div class="artist">Andrés Pardo</div>
+          <div class="title">Territorio</div>
+          <div class="price-row"><span class="price">$920.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+      <div class="product">
+        <img src="https://picsum.photos/300/340?88" alt="Memoria Viva">
+        <div class="body">
+          <div class="artist">Julián Ortega</div>
+          <div class="title">Memoria Viva</div>
+          <div class="price-row"><span class="price">$1.050.000</span><button class="buy">Comprar</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="nav-mark" style="font-size:1rem;">Gallery24</span>
+    <span class="mono">El arte sin fronteras — Latinoamérica, 2026</span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.filters .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filters .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.buy').forEach(btn => {
+    btn.addEventListener('click', () => alert('El flujo de compra se conecta en la Fase 2 (marketplace).'));
+  });
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); } });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
