@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sala 5 — Exposiciones temporales · Gallery24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  .hero-room{ padding:170px 0 40px; }
+  .breadcrumb{ margin-bottom:22px; }
+  .breadcrumb a{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--wine); text-decoration:none; }
+  .breadcrumb a:hover{ text-decoration:underline; }
+  .hero-room h1{ font-size:clamp(2.1rem, 4.4vw, 3.4rem); max-width:16ch; }
+  .hero-room h1 em{ font-style:italic; color:var(--wine); }
+  .hero-room p{ max-width:52ch; margin-top:18px; color:var(--ink-soft); font-size:1.02rem; }
+
+  .cover{
+    position:relative; border-radius:52px; overflow:hidden; height:360px;
+    box-shadow:0 30px 60px -30px rgba(33,29,25,0.35);
+  }
+  .cover img{ width:100%; height:100%; object-fit:cover; }
+  .cover::after{ content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(20,10,15,0.75), transparent 55%); }
+  .cover-info{ position:absolute; left:36px; bottom:32px; color:var(--paper); z-index:2; }
+  .cover-info .frame-title{ font-family:'Fraunces', serif; font-style:italic; font-size:2rem; }
+  .cover-info .mono{ color:var(--brass-soft); }
+  .dates{
+    position:absolute; right:36px; bottom:32px; z-index:2;
+    background:rgba(251,250,247,0.94); border-radius:24px; padding:16px 22px; text-align:center;
+  }
+  .dates .mono{ color:var(--wine); }
+  .dates .range{ font-family:'Fraunces', serif; font-size:1.1rem; margin-top:4px; }
+
+  .exhibit-body{ display:grid; grid-template-columns:1fr 1fr; gap:50px; margin-top:56px; align-items:start; }
+  @media (max-width:860px){ .exhibit-body{ grid-template-columns:1fr; } }
+  .exhibit-body p{ color:var(--ink-soft); line-height:1.7; }
+
+  .works-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  .work{ position:relative; border-radius:26px; overflow:hidden; aspect-ratio:4/5; }
+  .work img{ width:100%; height:100%; object-fit:cover; }
+  .work span{
+    position:absolute; bottom:10px; left:10px; right:10px;
+    color:var(--paper); font-family:'IBM Plex Mono', monospace; font-size:0.6rem;
+    background:rgba(20,10,15,0.55); padding:5px 10px; border-radius:999px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-mark" href="inicio.html">Gallery24</a>
+  <div class="nav-links">
+    <a href="inicio.html#recorrido">Recorrido</a>
+    <a href="index.html">Iniciar sesión</a>
+  </div>
+</nav>
+
+<header class="hero-room wrap">
+  <div class="breadcrumb"><a href="inicio.html#recorrido">← Volver al recorrido</a></div>
+  <span class="section-num">Sala 05</span>
+  <h1 style="margin-top:14px;">Muestras con <em>fecha</em> de apertura y cierre.</h1>
+  <p>Cada artista puede organizar su propia exposición digital: una colección de obras con un principio y un final, tal como una muestra física.</p>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="cover reveal">
+      <img src="https://picsum.photos/1200/500?31" alt="Portada de la exposición">
+      <div class="cover-info">
+        <span class="mono">Exposición temporal</span>
+        <div class="frame-title">Cartagena Eterna</div>
+      </div>
+      <div class="dates">
+        <span class="mono">En exhibición</span>
+        <div class="range">3 — 30 ago 2026</div>
+      </div>
+    </div>
+
+    <div class="exhibit-body reveal">
+      <div>
+        <span class="mono" style="color:var(--wine);">Sobre la muestra</span>
+        <p style="margin-top:14px;">Diez piezas inéditas de Camila Restrepo sobre la memoria de la ciudad amurallada. Una exploración cromática entre el atardecer del Caribe y la piedra colonial, reunida por primera vez como colección completa.</p>
+        <div class="hero-cta" style="margin-top:26px;">
+          <a class="btn btn-primary" href="sala-2-galerias.html">Recorrer la exposición →</a>
+          <a class="btn btn-ghost" href="sala-6-eventos.html">Ver evento de inauguración</a>
+        </div>
+      </div>
+      <div class="works-grid">
+        <div class="work"><img src="https://picsum.photos/300/380?11" alt=""><span>Cartagena Eterna</span></div>
+        <div class="work"><img src="https://picsum.photos/300/380?23" alt=""><span>Muralla al atardecer</span></div>
+        <div class="work"><img src="https://picsum.photos/300/380?45" alt=""><span>Costa Adentro</span></div>
+        <div class="work"><img src="https://picsum.photos/300/380?67" alt=""><span>Raíces</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="nav-mark" style="font-size:1rem;">Gallery24</span>
+    <span class="mono">El arte sin fronteras — Latinoamérica, 2026</span>
+  </div>
+</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); io.unobserve(entry.target); } });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
