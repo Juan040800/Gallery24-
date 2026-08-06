@@ -159,3 +159,238 @@ body{
     padding:70px;
 
 }
+/* ======================================================
+   Pestañas
+====================================================== */
+
+.tabs{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:40px;
+
+}
+
+.tabs button{
+
+    flex:1;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.35s;
+
+    background:#ececec;
+
+}
+
+.tabs button.active{
+
+    background:var(--primary);
+
+    color:white;
+
+    box-shadow:0 10px 20px rgba(140,82,255,.35);
+
+}
+
+/* ======================================================
+   Formularios
+====================================================== */
+
+form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:22px;
+
+}
+
+form h2{
+
+    font-size:34px;
+
+    color:#111827;
+
+    margin-bottom:15px;
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+/* ======================================================
+   Inputs
+====================================================== */
+
+.input-group{
+
+    display:flex;
+
+    align-items:center;
+
+    border:1px solid #d8d8d8;
+
+    border-radius:12px;
+
+    padding:0 18px;
+
+    transition:.30s;
+
+    background:white;
+
+}
+
+.input-group:focus-within{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 4px rgba(140,82,255,.15);
+
+}
+
+.input-group i{
+
+    color:#777;
+
+    width:22px;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    padding:18px;
+
+    font-size:16px;
+
+    background:transparent;
+
+}
+
+/* ======================================================
+   Botón principal
+====================================================== */
+
+.btn-primary{
+
+    border:none;
+
+    cursor:pointer;
+
+    padding:18px;
+
+    border-radius:12px;
+
+    background:linear-gradient(
+        90deg,
+        var(--primary),
+        var(--secondary)
+    );
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    transition:.35s;
+
+}
+
+.btn-primary:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 15px 30px rgba(140,82,255,.35);
+
+}
+
+/* ======================================================
+   Botón Google
+====================================================== */
+
+.google-btn{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    font-size:16px;
+
+    transition:.30s;
+
+}
+
+.google-btn:hover{
+
+    background:#f5f5f5;
+
+}
+
+.google-btn i{
+
+    color:#db4437;
+
+    font-size:20px;
+
+}
+
+/* ======================================================
+   Link recuperar contraseña
+====================================================== */
+
+#forgotPassword{
+
+    text-align:center;
+
+    text-decoration:none;
+
+    color:var(--primary);
+
+    font-weight:500;
+
+    transition:.25s;
+
+}
+
+#forgotPassword:hover{
+
+    text-decoration:underline;
+
+}
