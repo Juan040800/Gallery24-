@@ -1,0 +1,161 @@
+/* ======================================================
+   Gallery24 Login
+   Autor: OpenAI
+   Diseño: Moderno / Glassmorphism
+====================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --primary:#8c52ff;
+    --secondary:#5b21b6;
+
+    --background:#0b1120;
+
+    --card:rgba(255,255,255,.08);
+
+    --border:rgba(255,255,255,.15);
+
+    --text:#ffffff;
+
+    --text2:#b8b8b8;
+
+    --shadow:0 20px 40px rgba(0,0,0,.35);
+
+}
+
+body{
+
+    font-family:"Poppins",sans-serif;
+
+    min-height:100vh;
+
+    overflow:hidden;
+
+    background:linear-gradient(
+        135deg,
+        #050816,
+        #111827,
+        #1e293b
+    );
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+/* Fondo */
+
+.background{
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+    radial-gradient(circle at top left,#7c3aed33,transparent 40%),
+    radial-gradient(circle at bottom right,#2563eb22,transparent 35%);
+
+    filter:blur(30px);
+
+}
+
+/* Contenedor */
+
+.container{
+
+    width:1200px;
+
+    max-width:95%;
+
+    height:700px;
+
+    display:flex;
+
+    border-radius:30px;
+
+    overflow:hidden;
+
+    backdrop-filter:blur(20px);
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    box-shadow:var(--shadow);
+
+}
+
+/* Panel izquierdo */
+
+.left-panel{
+
+    width:45%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:60px;
+
+    color:white;
+
+}
+
+.logo{
+
+    width:120px;
+
+    margin-bottom:25px;
+
+}
+
+.left-panel h1{
+
+    font-size:55px;
+
+    margin-bottom:20px;
+
+}
+
+.left-panel p{
+
+    color:#d8d8d8;
+
+    line-height:1.8;
+
+    font-size:18px;
+
+}
+
+/* Panel derecho */
+
+.right-panel{
+
+    width:55%;
+
+    background:#ffffff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    padding:70px;
+
+}
