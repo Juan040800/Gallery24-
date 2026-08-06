@@ -394,3 +394,293 @@ form h2{
     text-decoration:underline;
 
 }
+/* ======================================================
+   ANIMACIONES
+====================================================== */
+
+.container{
+
+    animation:fadeIn .8s ease;
+
+}
+
+.left-panel{
+
+    animation:slideLeft .9s ease;
+
+}
+
+.right-panel{
+
+    animation:slideRight .9s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+@keyframes slideLeft{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(-80px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+@keyframes slideRight{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(80px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+/* ======================================================
+   EFECTOS
+====================================================== */
+
+.logo{
+
+    transition:.35s;
+
+}
+
+.logo:hover{
+
+    transform:scale(1.08) rotate(-4deg);
+
+}
+
+.left-panel h1{
+
+    letter-spacing:1px;
+
+}
+
+.left-panel p{
+
+    max-width:420px;
+
+}
+
+.btn-primary:active{
+
+    transform:scale(.98);
+
+}
+
+.google-btn:active{
+
+    transform:scale(.98);
+
+}
+
+.input-group{
+
+    transition:
+        border-color .3s,
+        box-shadow .3s,
+        transform .3s;
+
+}
+
+.input-group:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* ======================================================
+   SCROLL
+====================================================== */
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:var(--primary);
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#111827;
+
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media(max-width:1100px){
+
+.container{
+
+    width:95%;
+
+}
+
+.left-panel{
+
+    padding:40px;
+
+}
+
+.right-panel{
+
+    padding:45px;
+
+}
+
+}
+
+@media(max-width:900px){
+
+.container{
+
+    flex-direction:column;
+
+    height:auto;
+
+    margin:30px 0;
+
+}
+
+.left-panel{
+
+    width:100%;
+
+    padding:60px 35px;
+
+}
+
+.right-panel{
+
+    width:100%;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.left-panel h1{
+
+    font-size:38px;
+
+}
+
+.left-panel p{
+
+    font-size:15px;
+
+}
+
+.right-panel{
+
+    padding:30px;
+
+}
+
+.tabs button{
+
+    font-size:15px;
+
+}
+
+form h2{
+
+    font-size:28px;
+
+}
+
+.btn-primary{
+
+    font-size:16px;
+
+}
+
+.google-btn{
+
+    font-size:15px;
+
+}
+
+}
+
+/* ======================================================
+   PEQUEÑOS DETALLES
+====================================================== */
+
+button{
+
+    font-family:"Poppins",sans-serif;
+
+}
+
+input{
+
+    font-family:"Poppins",sans-serif;
+
+}
+
+a{
+
+    font-family:"Poppins",sans-serif;
+
+}
+
+::selection{
+
+    background:var(--primary);
+
+    color:white;
+
+}
