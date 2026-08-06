@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="estilo.css">
+<script type="module" src="firebase-init.js"></script>
 <style>
   main{ min-height:100vh; display:grid; grid-template-columns:1.05fr 1fr; align-items:stretch; }
   @media (max-width:920px){ main{ grid-template-columns:1fr; } }
@@ -132,6 +133,7 @@
   </section>
 </main>
 
+<script src="auth.js"></script>
 <script>
   const form = document.getElementById('loginForm');
   const error = document.getElementById('formError');
@@ -140,12 +142,19 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     if (!email || !password) {
+      error.textContent = 'Revisa tu correo y contraseña e inténtalo de nuevo.';
       error.classList.add('show');
       return;
     }
+
+    const result = loginUser(email, password);
+    if (!result.ok) {
+      error.textContent = result.error;
+      error.classList.add('show');
+      return;
+    }
+
     error.classList.remove('show');
-    // Autenticación real pendiente para la Fase 2 (base de datos / backend).
-    // Por ahora, simula el ingreso y lleva a la galería principal.
     window.location.href = 'inicio.html';
   });
 </script>
