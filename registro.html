@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crear cuenta — Gallery24</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilo.css">
+<style>
+  main{ min-height:100vh; display:grid; grid-template-columns:1.05fr 1fr; align-items:stretch; }
+  @media (max-width:920px){ main{ grid-template-columns:1fr; } }
+
+  .scene{ position:relative; padding:170px 60px 60px; display:flex; flex-direction:column; justify-content:center; overflow:hidden; }
+  .scene::before{ content:""; position:absolute; top:-140px; left:-160px; width:520px; height:520px; background:radial-gradient(circle, rgba(110,31,62,0.12), transparent 65%); border-radius:50%; }
+  .scene-eyebrow{ display:flex; align-items:center; gap:10px; margin-bottom:22px; position:relative; z-index:1;}
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--wine); box-shadow:0 0 0 4px rgba(110,31,62,0.14); }
+  .scene-eyebrow .mono{ color:var(--wine); }
+  .scene h1{ position:relative; z-index:1; font-size:clamp(2rem, 3.6vw, 3rem); max-width:14ch; line-height:1.08; }
+  .scene h1 em{ font-style:italic; color:var(--wine); }
+  .scene p{ position:relative; z-index:1; max-width:38ch; margin-top:20px; color:var(--ink-soft); font-size:1rem; }
+
+  .cluster{ position:relative; z-index:1; display:flex; gap:22px; margin-top:56px; flex-wrap:wrap; }
+  .blob-img{ width:150px; height:190px; box-shadow:0 24px 44px -22px rgba(33,29,25,0.35); }
+  .blob-img:nth-child(1){ border-radius:58% 42% 63% 37% / 45% 53% 47% 55%; transform:translateY(18px) rotate(-2deg); }
+  .blob-img:nth-child(2){ border-radius:38% 62% 41% 59% / 60% 41% 59% 40%; }
+  .blob-img:nth-child(3){ border-radius:62% 38% 55% 45% / 40% 62% 38% 60%; transform:translateY(32px) rotate(1.5deg); }
+  .blob-img img{ width:100%; height:100%; object-fit:cover; border-radius:inherit; }
+  @media (max-width:920px){ .scene{ padding:160px 32px 40px; } .cluster{display:none;} }
+
+  .panel{ background:var(--paper); display:flex; align-items:center; justify-content:center; padding:170px 48px 60px; }
+  .card{ width:100%; max-width:420px; }
+  .card .mono{ color:var(--wine); }
+  .card h2{ font-size:1.7rem; margin-top:12px; margin-bottom:8px; }
+  .card .card-sub{ color:var(--ink-soft); font-size:0.92rem; margin-bottom:30px; }
+
+  .role-select{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:26px; }
+  .role-opt{
+    position:relative;
+    text-align:center; padding:14px 6px;
+    border:1px solid var(--line); border-radius:20px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--ink-soft); cursor:pointer; transition:all .2s ease;
+  }
+  .role-opt input{ position:absolute; opacity:0; inset:0; cursor:pointer; }
+  .role-opt.checked{ border-color:var(--wine); background:#F6ECEF; color:var(--wine); }
+
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); margin-bottom:8px; }
+  .field input{ width:100%; padding:15px 20px; border:1px solid var(--line); border-radius:999px; background:#fff; font-family:'Inter', sans-serif; font-size:0.95rem; color:var(--ink); outline:none; transition:border-color .2s ease, box-shadow .2s ease; }
+  .field input:focus{ border-color:var(--wine); box-shadow:0 0 0 4px rgba(110,31,62,0.1); }
+  .field input::placeholder{ color:rgba(33,29,25,0.32); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  .terms{ display:flex; align-items:flex-start; gap:10px; font-size:0.82rem; color:var(--ink-soft); margin:20px 0 26px; }
+  .terms input{ margin-top:3px; accent-color:var(--wine); }
+  .terms a{ color:var(--wine); text-decoration:none; }
+  .terms a:hover{ text-decoration:underline; }
+
+  .btn-full{ width:100%; justify-content:center; }
+
+  .divider{ display:flex; align-items:center; gap:14px; margin:26px 0; }
+  .divider::before, .divider::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .divider span{ font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.1em; }
+
+  .btn-alt{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; padding:15px 26px; border-radius:999px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:10px; border:1px solid var(--line); background:#fff; color:var(--ink); cursor:pointer; transition:all .25s ease; margin-bottom:12px; }
+  .btn-alt:hover{ border-color:var(--wine); color:var(--wine); }
+
+  .card-foot{ margin-top:30px; text-align:center; font-size:0.9rem; color:var(--ink-soft); }
+  .card-foot a{ color:var(--wine); text-decoration:none; font-weight:600; }
+  .card-foot a:hover{ text-decoration:underline; }
+
+  .error{ display:none; background:#F7E9EE; color:var(--wine-deep); border-radius:16px; padding:12px 18px; font-size:0.85rem; margin-bottom:20px; }
+  .error.show{ display:block; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-mark" href="inicio.html">Gallery24</a>
+  <div class="nav-links">
+    <a href="subasta.html">Subasta en vivo</a>
+    <a href="inicio.html">Explorar sin cuenta</a>
+    <a href="index.html" class="nav-cta">Iniciar sesión</a>
+  </div>
+</nav>
+
+<main>
+  <section class="scene">
+    <div class="scene-eyebrow">
+      <span class="dot"></span>
+      <span class="mono">Nuevo en Gallery24</span>
+    </div>
+    <h1>Tu obra merece<br>una <em>sala</em> propia.</h1>
+    <p>Crea tu cuenta para publicar tu trabajo, seguir a otros artistas, guardar obras favoritas y participar en subastas y exposiciones.</p>
+
+    <div class="cluster" aria-hidden="true">
+      <div class="blob-img"><img src="https://picsum.photos/300/380?45" alt=""></div>
+      <div class="blob-img"><img src="https://picsum.photos/300/380?67" alt=""></div>
+      <div class="blob-img"><img src="https://picsum.photos/300/380?88" alt=""></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="card">
+      <span class="mono">Empecemos</span>
+      <h2>Crear cuenta</h2>
+      <p class="card-sub">Es gratis y toma menos de un minuto.</p>
+
+      <div class="error" id="formError">Revisa los campos marcados e inténtalo de nuevo.</div>
+
+      <button type="button" class="btn-alt">Continuar con Google</button>
+
+      <div class="divider"><span>o con tu correo</span></div>
+
+      <form id="registerForm" novalidate>
+        <span style="font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); display:block; margin-bottom:10px;">Vengo como</span>
+        <div class="role-select" id="roleSelect">
+          <label class="role-opt checked"><input type="radio" name="role" value="artista" checked>Artista</label>
+          <label class="role-opt"><input type="radio" name="role" value="coleccionista">Coleccionista</label>
+          <label class="role-opt"><input type="radio" name="role" value="institucion">Institución</label>
+        </div>
+
+        <div class="field">
+          <label for="name">Nombre completo</label>
+          <input type="text" id="name" name="name" placeholder="Tu nombre" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com" required autocomplete="email">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+          <div class="field">
+            <label for="password2">Confirmar</label>
+            <input type="password" id="password2" name="password2" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <label class="terms">
+          <input type="checkbox" id="terms" required>
+          <span>Acepto los <a href="#">términos de uso</a> y la <a href="#">política de privacidad</a> de Gallery24.</span>
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-full">Crear mi cuenta →</button>
+      </form>
+
+      <p class="card-foot">¿Ya tienes cuenta? <a href="index.html">Inicia sesión</a></p>
+    </div>
+  </section>
+</main>
+
+<script>
+  document.querySelectorAll('.role-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.role-opt').forEach(o => o.classList.remove('checked'));
+      opt.classList.add('checked');
+    });
+  });
+
+  const form = document.getElementById('registerForm');
+  const error = document.getElementById('formError');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const password2 = document.getElementById('password2').value;
+    const terms = document.getElementById('terms').checked;
+
+    if (!name || !email || !password || !password2 || !terms) {
+      error.textContent = 'Revisa los campos marcados e inténtalo de nuevo.';
+      error.classList.add('show');
+      return;
+    }
+    if (password !== password2) {
+      error.textContent = 'Las contraseñas no coinciden.';
+      error.classList.add('show');
+      return;
+    }
+    error.classList.remove('show');
+    // Registro real pendiente para la Fase 2 (base de datos / backend).
+    window.location.href = 'inicio.html';
+  });
+</script>
+
+</body>
+</html>
