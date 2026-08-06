@@ -352,4 +352,93 @@
       <a class="room-row" href="sala-3-guia-ia.html"><span class="room-no">03</span><span class="room-name">Guía con IA</span><span class="room-desc">Un acompañante virtual que explica las obras, contextualiza al artista y recomienda exposiciones.</span></a>
       <a class="room-row" href="sala-4-marketplace.html"><span class="room-no">04</span><span class="room-name">Marketplace</span><span class="room-desc">Venta directa entre artista y coleccionista, con comisión transparente por transacción.</span></a>
       <a class="room-row" href="sala-5-exposiciones.html"><span class="room-no">05</span><span class="room-name">Exposiciones temporales</span><span class="room-desc">Muestras digitales con fecha de apertura y cierre, organizadas por el propio artista.</span></a>
-      <a class="room-row" href="sala-6-eventos.html"><
+      <a class="room-row" href="sala-6-eventos.html"><span class="room-no">06</span><span class="room-name">Eventos</span><span class="room-desc">Talleres, conversatorios y lanzamientos que conectan a la comunidad en vivo.</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="fases">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="section-num">05 — Expansión</span><h2 style="margin-top:14px;">De plataforma web a experiencia inmersiva</h2></div>
+    </div>
+  </div>
+  <div class="wrap phases-wrap reveal">
+    <svg class="phases-wave" viewBox="0 0 1400 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,60 C120,10 240,110 360,60 C480,10 600,110 720,60 C840,10 960,110 1080,60 C1200,10 1320,110 1400,60"
+            stroke="var(--wine)" stroke-width="2" fill="none" stroke-dasharray="1 14" stroke-linecap="round"></path>
+    </svg>
+    <div class="phases">
+      <div class="phase is-now"><span class="mono">Fase 1</span><h3>Plataforma base</h3><p>Perfiles de artista y publicación de obras.</p><span class="phase-tag">En curso</span></div>
+      <div class="phase"><span class="mono">Fase 2</span><h3>Marketplace</h3><p>Venta directa completa entre artistas y coleccionistas.</p></div>
+      <div class="phase"><span class="mono">Fase 3</span><h3>Galerías 3D</h3><p>Salas inmersivas navegables desde el navegador.</p></div>
+      <div class="phase"><span class="mono">Fase 4</span><h3>RV y RA</h3><p>Recorridos en realidad virtual y aumentada.</p></div>
+      <div class="phase"><span class="mono">Fase 5</span><h3>Curaduría IA</h3><p>Recomendaciones inteligentes y guía virtual avanzada.</p></div>
+      <div class="phase"><span class="mono">Fase 6</span><h3>Alianzas globales</h3><p>Eventos internacionales con museos e instituciones.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="quien">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div><span class="section-num">06 — Para quién</span><h2 style="margin-top:14px;">Un mismo museo, distintas entradas</h2></div>
+    </div>
+    <div class="audience reveal">
+      <span class="chip">Pintores</span><span class="chip">Fotógrafos</span><span class="chip">Escultores</span>
+      <span class="chip">Artistas digitales</span><span class="chip">Videoartistas</span><span class="chip">Coleccionistas</span>
+      <span class="chip">Galerías</span><span class="chip">Museos</span><span class="chip">Instituciones culturales</span>
+      <span class="chip">Empresas</span><span class="chip">Público general</span>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="wrap reveal">
+    <span class="section-num">07 — Entrar</span>
+    <h2 style="margin-top:14px;">El arte no necesita permiso para ser visto.</h2>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#sala">Volver a la sala →</a>
+      <a class="btn btn-ghost" href="#recorrido">Ver el recorrido de nuevo</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="nav-mark" style="font-size:1rem;">Gallery24</span>
+    <span class="mono">El arte sin fronteras — Latinoamérica, 2026</span>
+  </div>
+</footer>
+
+<script>
+  const frames = document.querySelectorAll('#frames .frame');
+  const thumbs = document.querySelectorAll('#filmstrip .film-thumb');
+  const captionTitle = document.getElementById('captionTitle');
+  const captionArtist = document.getElementById('captionArtist');
+
+  function setFeatured(index){
+    frames.forEach((f, i) => f.classList.toggle('is-featured', i === index));
+    thumbs.forEach((t, i) => t.classList.toggle('active', i === index));
+    const f = frames[index];
+    captionTitle.textContent = f.dataset.title;
+    captionArtist.textContent = f.dataset.artist;
+  }
+
+  frames.forEach((f, i) => f.addEventListener('click', () => setFeatured(i)));
+  thumbs.forEach((t) => t.addEventListener('click', () => setFeatured(parseInt(t.dataset.target, 10))));
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
