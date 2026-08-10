@@ -1,176 +1,48 @@
-// ============================================================
-// Gallery24 - auth.js
-// Gestión de autenticación con Firebase
-// ============================================================
-
-import { auth } from "./firebase-init.js";
-
+// auth.js — Lógica de autenticación con Firebase
+import { auth } from './firebase-init.js';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
+  signInWithPopup,
+  GoogleAuthProvider,
   sendPasswordResetEmail,
-  onAuthStateChanged,
-  updateProfile
-} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+  signOut,
+  onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-// ============================================================
-// UTILIDAD PARA MOSTRAR MENSAJES
-// ============================================================
+const googleProvider = new GoogleAuthProvider();
 
-function mostrarMensaje(mensaje, tipo = "info") {
-  console.log(`[${tipo.toUpperCase()}] ${mensaje}`);
-  alert(mensaje); // Luego podemos reemplazarlo por notificaciones elegantes
+// Registro con correo y contraseña
+export async function registrarConCorreo(correo, contrasena) {
+  const cred = await createUserWithEmailAndPassword(auth, correo, contrasena);
+  return cred.user;
 }
 
-// ============================================================
-// REGISTRO
-// ============================================================
-
-export async function registrarUsuario(nombre, email, password) {
-  try {
-
-    const credencial = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
-    await updateProfile(credencial.user, {
-      displayName: nombre
-    });
-
-    mostrarMensaje("Cuenta creada correctamente ✅", "success");
-
-    return credencial.user;
-
-  } catch (error) {
-
-    mostrarMensaje(traducirError(error.code), "error");
-
-    throw error;
-  }
+// Login con correo y contraseña
+export async function iniciarSesionConCorreo(correo, contrasena) {
+  const cred = await signInWithEmailAndPassword(auth, correo, contrasena);
+  return cred.user;
 }
 
-// ============================================================
-// LOGIN
-// ============================================================
-
-export async function iniciarSesion(email, password) {
-
-  try {
-
-    const credencial = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
-    mostrarMensaje("Bienvenido a Gallery24 🎨", "success");
-
-    return credencial.user;
-
-  } catch (error) {
-
-    mostrarMensaje(traducirError(error.code), "error");
-
-    throw error;
-  }
+// Login con Google (abre popup)
+export async function iniciarSesionConGoogle() {
+  const cred = await signInWithPopup(auth, googleProvider);
+  return cred.user;
 }
 
-// ============================================================
-// LOGOUT
-// ============================================================
+// Recuperar contraseña
+export async function recuperarContrasena(correo) {
+  await sendPasswordResetEmail(auth, correo);
+}
 
+// Cerrar sesión
 export async function cerrarSesion() {
-
-  try {
-
-    await signOut(auth);
-
-    mostrarMensaje("Sesión cerrada correctamente.", "success");
-
-  } catch (error) {
-
-    mostrarMensaje(traducirError(error.code), "error");
-
-  }
-
+  await signOut(auth);
 }
 
-// ============================================================
-// RECUPERAR CONTRASEÑA
-// ============================================================
-
-export async function recuperarPassword(email) {
-
-  try {
-
-    await sendPasswordResetEmail(auth, email);
-
-    mostrarMensaje(
-      "Se envió un correo para recuperar tu contraseña.",
-      "success"
-    );
-
-  } catch (error) {
-
-    mostrarMensaje(traducirError(error.code), "error");
-
-  }
-
-}
-
-// ============================================================
-// OBSERVADOR DE SESIÓN
-// ============================================================
-
-onAuthStateChanged(auth, (user) => {
-
-  if (user) {
-
-    console.log("Usuario conectado:");
-    console.log(user);
-
-  } else {
-
-    console.log("No hay sesión iniciada.");
-
-  }
-
-});
-
-// ============================================================
-// TRADUCTOR DE ERRORES
-// ============================================================
-
-function traducirError(codigo) {
-
-  switch (codigo) {
-
-    case "auth/email-already-in-use":
-      return "Este correo ya está registrado.";
-
-    case "auth/invalid-email":
-      return "Correo electrónico inválido.";
-
-    case "auth/weak-password":
-      return "La contraseña debe tener al menos 6 caracteres.";
-
-    case "auth/user-not-found":
-      return "No existe una cuenta con ese correo.";
-
-    case "auth/wrong-password":
-      return "Contraseña incorrecta.";
-
-    case "auth/invalid-credential":
-      return "Correo o contraseña incorrectos.";
-
-    case "auth/network-request-failed":
-      return "No hay conexión a Internet.";
-
-    default:
-      return "Ocurrió un error inesperado.";
-  }
-
+// Escuchar cambios de sesión (para usar en cualquier página protegida)
+export function escucharEstadoAuth(callback) {
+  onAuthStateChanged(auth, (usuario) => {
+    callback(usuario); // usuario será null si no hay sesión activa
+  });
 }
