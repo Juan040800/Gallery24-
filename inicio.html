@@ -106,6 +106,20 @@
   .film-thumb img{ width:100%; height:100%; object-fit:cover; }
   .film-thumb.active, .film-thumb:hover{ opacity:1; border-color:var(--wine); transform:translateY(-3px); }
 
+  /* ---------- BANNER SALA 3D ---------- */
+  .banner-3d{
+    text-decoration:none; display:block;
+  }
+  .banner-3d .inner{
+    background:var(--wine-deep); color:var(--paper); border-radius:44px; padding:38px 44px;
+    display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap;
+    box-shadow:0 26px 50px -26px rgba(78,21,48,0.45);
+    border:1px solid rgba(228,205,142,0.25);
+  }
+  .banner-3d .tag{ color:var(--brass-soft); }
+  .banner-3d h3{ font-family:'Fraunces', serif; font-size:1.6rem; margin-top:10px; font-weight:500; }
+  .banner-3d .go{ background:var(--brass); color:var(--wine-deep); border-color:var(--brass); }
+
   /* ---------- MANIFIESTO ---------- */
   .manifiesto{ background:var(--wine-deep); color:var(--paper); border-radius:64px; margin:0 20px; }
   .manifiesto blockquote{ font-family:'Fraunces', serif; font-size:clamp(1.6rem, 3.4vw, 2.7rem); font-weight:300; font-style:italic; line-height:1.28; max-width:22ch; }
@@ -193,6 +207,7 @@
   <div class="nav-links">
     <a href="#coleccion">Colección</a>
     <a href="#sala">Sala de previsualización</a>
+    <a href="sala-virtual-3d.html">Sala 3D</a>
     <a href="#recorrido">Recorrido</a>
     <a href="#fases">Fases</a>
     <a href="subasta.html">Subasta en vivo</a>
@@ -300,6 +315,20 @@
 
 <section class="reveal" style="padding-top:0;">
   <div class="wrap">
+    <a href="sala-virtual-3d.html" class="banner-3d">
+      <div class="inner">
+        <div>
+          <span class="mono tag">Nuevo · Sala navegable en 3D</span>
+          <h3>Camina dentro de la sala y observa cada obra como si estuvieras ahí.</h3>
+        </div>
+        <span class="btn go">Entrar a la sala 3D →</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="reveal" style="padding-top:0;">
+  <div class="wrap">
     <a href="subasta.html" style="text-decoration:none; display:block;">
       <div style="background:var(--wine); color:var(--paper); border-radius:44px; padding:38px 44px; display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; box-shadow:0 26px 50px -26px rgba(78,21,48,0.45);">
         <div>
@@ -371,7 +400,7 @@
     <div class="phases">
       <div class="phase is-now"><span class="mono">Fase 1</span><h3>Plataforma base</h3><p>Perfiles de artista y publicación de obras.</p><span class="phase-tag">En curso</span></div>
       <div class="phase"><span class="mono">Fase 2</span><h3>Marketplace</h3><p>Venta directa completa entre artistas y coleccionistas.</p></div>
-      <div class="phase"><span class="mono">Fase 3</span><h3>Galerías 3D</h3><p>Salas inmersivas navegables desde el navegador.</p></div>
+      <div class="phase"><span class="mono">Fase 3</span><h3>Galerías 3D</h3><p>Salas inmersivas navegables desde el navegador.</p><span class="phase-tag">En curso</span></div>
       <div class="phase"><span class="mono">Fase 4</span><h3>RV y RA</h3><p>Recorridos en realidad virtual y aumentada.</p></div>
       <div class="phase"><span class="mono">Fase 5</span><h3>Curaduría IA</h3><p>Recomendaciones inteligentes y guía virtual avanzada.</p></div>
       <div class="phase"><span class="mono">Fase 6</span><h3>Alianzas globales</h3><p>Eventos internacionales con museos e instituciones.</p></div>
@@ -439,6 +468,9 @@
   }, { threshold: 0.15 });
   revealEls.forEach(el => io.observe(el));
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
