@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gallery24 — Sala Virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wine:#6E1F3E;
+    --wine-deep:#4E1530;
+    --brass:#C9A44F;
+    --brass-soft:#E4CD8E;
+    --paper:#FBFAF7;
+    --ink:#211D19;
+    --ink-soft:#5B564E;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ width:100%; height:100%; overflow:hidden; background:#000; font-family:'Inter', sans-serif; }
+  canvas{ display:block; }
+
+  #hud{
+    position:fixed; inset:0; pointer-events:none; z-index:10;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+
+  #topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 30px; pointer-events:auto;
+  }
+  #topbar a.back{
+    color:var(--paper); text-decoration:none; font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem; letter-spacing:0.04em; background:rgba(20,10,15,0.45);
+    padding:10px 16px; border-radius:999px; border:1px solid rgba(228,205,142,0.35);
+    transition:background .2s ease;
+  }
+  #topbar a.back:hover{ background:rgba(20,10,15,0.7); }
+  #topbar .mark{
+    color:var(--brass-soft); font-family:'IBM Plex Mono', monospace; font-size:0.72rem;
+    letter-spacing:0.08em; background:rgba(20,10,15,0.45); padding:10px 16px; border-radius:999px;
+    border:1px solid rgba(228,205,142,0.25);
+  }
+
+  #crosshair{
+    position:fixed; top:50%; left:50%; width:6px; height:6px;
+    margin:-3px 0 0 -3px; border-radius:50%; background:rgba(251,250,247,0.85);
+    box-shadow:0 0 0 1px rgba(20,10,15,0.5); z-index:11;
+  }
+
+  #caption{
+    position:fixed; left:50%; bottom:70px; transform:translate(-50%, 12px);
+    text-align:center; color:var(--paper); opacity:0; transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none; z-index:10;
+  }
+  #caption.show{ opacity:1; transform:translate(-50%, 0); }
+  #caption .cap-artist{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.06em; color:var(--brass-soft); display:block; margin-bottom:6px; }
+  #caption .cap-title{ font-family:'Fraunces', serif; font-style:italic; font-size:1.3rem; }
+  #caption .cap-tech{ font-family:'IBM Plex Mono', monospace; font-size:0.65rem; color:rgba(251,250,247,0.7); margin-top:6px; display:block; }
+
+  #hint{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    color:rgba(251,250,247,0.6); font-family:'IBM Plex Mono', monospace; font-size:0.65rem;
+    letter-spacing:0.04em; z-index:10; pointer-events:none;
+  }
+
+  #startScreen{
+    position:fixed; inset:0; z-index:20; background:
+      radial-gradient(120% 70% at 50% -10%, rgba(110,31,62,0.35), transparent 60%),
+      linear-gradient(180deg, #14100E 0%, #0B0908 100%);
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    text-align:center; padding:24px; cursor:pointer;
+  }
+  #startScreen .eyebrow{ color:var(--brass-soft); font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.1em; margin-bottom:18px; }
+  #startScreen h1{ color:var(--paper); font-family:'Fraunces', serif; font-weight:500; font-size:clamp(1.8rem, 5vw, 3rem); max-width:16ch; line-height:1.15; }
+  #startScreen h1 em{ font-style:italic; color:var(--brass-soft); }
+  #startScreen p{ color:rgba(251,250,247,0.65); max-width:42ch; margin-top:18px; font-size:0.95rem; line-height:1.5; }
+  #startScreen .key{
+    display:inline-block; background:rgba(251,250,247,0.08); border:1px solid rgba(228,205,142,0.3);
+    color:var(--brass-soft); padding:2px 9px; border-radius:6px; font-family:'IBM Plex Mono', monospace; font-size:0.75rem;
+  }
+  #startScreen .playbtn{
+    margin-top:36px; background:var(--wine); color:var(--paper); border:none; padding:16px 34px;
+    border-radius:999px; font-family:'Inter', sans-serif; font-weight:600; font-size:0.95rem;
+    letter-spacing:0.02em; cursor:pointer; box-shadow:0 20px 40px -18px rgba(110,31,62,0.7);
+  }
+  #startScreen.hidden{ display:none; }
+
+  #loading{
+    position:fixed; inset:0; z-index:25; background:#0B0908; color:var(--brass-soft);
+    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono', monospace;
+    font-size:0.8rem; letter-spacing:0.06em;
+  }
+  #loading.hidden{ display:none; }
+</style>
+</head>
+<body>
+
+<div id="loading">Cargando la sala…</div>
+
+<div id="startScreen" class="hidden">
+  <span class="eyebrow">Gallery24 — Sala virtual</span>
+  <h1>Camina entre las obras<br>como si <em>estuvieras ahí</em>.</h1>
+  <p>Usa <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span> para moverte y el mouse para mirar alrededor. Acércate a un cuadro para ver su ficha.</p>
+  <button class="playbtn" id="playBtn">Entrar a la sala →</button>
+</div>
+
+<div id="hud">
+  <div id="topbar">
+    <span class="mark">Sala 02 — Previsualización 3D</span>
+    <a class="back" href="index.html">← Volver a Gallery24</a>
+  </div>
+  <div></div>
+</div>
+
+<div id="crosshair"></div>
+<div id="caption">
+  <span class="cap-artist" id="capArtist"></span>
+  <span class="cap-title" id="capTitle"></span>
+  <span class="cap-tech" id="capTech"></span>
+</div>
+<div id="hint">W A S D para moverte · mouse para mirar · ESC para liberar el cursor</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  const COLORS = {
+    wine: 0x6E1F3E,
+    wineDeep: 0x4E1530,
+    brass: 0xC9A44F,
+    paper: 0xFBFAF7,
+    floor: 0xEDE7DA,
+    baseboard: 0x2A2320,
+  };
+
+  const ARTWORKS = [
+    { img: "https://picsum.photos/700/900?11", title: "Cartagena Eterna", artist: "Camila Restrepo", tech: "Óleo sobre lienzo · 80 × 100 cm" },
+    { img: "https://picsum.photos/700/900?22", title: "Lo que Permanece", artist: "Julián Ortega", tech: "Fotografía · impresión giclée" },
+    { img: "https://picsum.photos/700/900?33", title: "Raíces", artist: "Mariana Duque", tech: "Escultura en madera y bronce" },
+    { img: "https://picsum.photos/700/900?44", title: "Mural Urbano", artist: "Esteban Ríos", tech: "Arte urbano · acrílico sobre muro" },
+  ];
+
+  const ROOM = { width: 18, depth: 14, height: 6.4 };
+  const EYE_HEIGHT = 1.65;
+  const MOVE_SPEED = 4.2;
+  const LOOK_RANGE = 6.5;
+  const MARGIN = 0.6;
+
+  let scene, camera, renderer, clock;
+  let velocity = new THREE.Vector3();
+  const keys = { w:false, a:false, s:false, d:false };
+  let yaw = 0, pitch = 0;
+  let pointerLocked = false;
+  const raycaster = new THREE.Raycaster();
+  const paintingMeshes = [];
+  let activePainting = null;
+
+  const loadingEl = document.getElementById('loading');
+  const startEl = document.getElementById('startScreen');
+  const playBtn = document.getElementById('playBtn');
+  const captionEl = document.getElementById('caption');
+  const capArtist = document.getElementById('capArtist');
+  const capTitle = document.getElementById('capTitle');
+  const capTech = document.getElementById('capTech');
+
+  init();
+
+  function init(){
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x14100E);
+    scene.fog = new THREE.Fog(0x14100E, 12, 26);
+
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 100);
+    camera.position.set(0, EYE_HEIGHT, ROOM.depth/2 - 2);
+
+    renderer = new THREE.WebGLRenderer({ antialias:true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    buildRoom();
+    buildLighting();
+    buildArtworks();
+
+    clock = new THREE.Clock();
+
+    window.addEventListener('resize', onResize);
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('pointerlockchange', onPointerLockChange);
+
+    renderer.domElement.addEventListener('click', requestPointerLock);
+    playBtn.addEventListener('click', () => {
+      startEl.classList.add('hidden');
+      requestPointerLock();
+    });
+
+    loadingEl.classList.add('hidden');
+    startEl.classList.remove('hidden');
+
+    animate();
+  }
+
+  function buildRoom(){
+    const w = ROOM.width, d = ROOM.depth, h = ROOM.height;
+
+    const floorGeo = new THREE.PlaneGeometry(w, d, 20, 20);
+    const floorMat = new THREE.MeshStandardMaterial({ color: COLORS.floor, roughness:0.85, metalness:0.05 });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI/2;
+    scene.add(floor);
+
+    const ceilGeo = new THREE.PlaneGeometry(w, d);
+    const ceilMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness:1 });
+    const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
+    ceiling.rotation.x = Math.PI/2;
+    ceiling.position.y = h;
+    scene.add(ceiling);
+
+    const wallMat = new THREE.MeshStandardMaterial({ color: COLORS.paper, roughness:0.9 });
+    const baseMat = new THREE.MeshStandardMaterial({ color: COLORS.baseboard, roughness:0.7 });
+
+    function makeWall(width, height, x, z, rotY){
+      const wall = new THREE.Mesh(new THREE.PlaneGeometry(width, height), wallMat);
+      wall.position.set(x, height/2, z);
+      wall.rotation.y = rotY;
+      scene.add(wall);
+
+      const base = new THREE.Mesh(new THREE.BoxGeometry(width, 0.28, 0.06), baseMat);
+      base.position.set(x, 0.14, z + Math.cos(rotY) * 0.03 * 0);
+      base.rotation.y = rotY;
+      // offset base slightly inward from wall plane
+      base.position.x = x - Math.sin(rotY) * 0.03;
+      base.position.z = z - Math.cos(rotY) * 0.03;
+      scene.add(base);
+    }
+
+    makeWall(w, h, 0, -d/2, 0);          // norte
+    makeWall(w, h, 0, d/2, Math.PI);     // sur
+    makeWall(d, h, -w/2, 0, Math.PI/2);  // oeste
+    makeWall(d, h, w/2, 0, -Math.PI/2);  // este
+  }
+
+  function buildLighting(){
+    const ambient = new THREE.AmbientLight(0xFFF4D6, 0.55);
+    scene.add(ambient);
+
+    const hemi = new THREE.HemisphereLight(0xFFF7E8, 0x1A1512, 0.35);
+    scene.add(hemi);
+
+    positions().forEach(p => {
+      const spot = new THREE.SpotLight(0xFFEFC9, 0.9, 12, Math.PI/5, 0.5, 1.2);
+      spot.position.set(p.lightPos.x, ROOM.height - 0.4, p.lightPos.z);
+      spot.target.position.set(p.pos.x, EYE_HEIGHT, p.pos.z);
+      scene.add(spot);
+      scene.add(spot.target);
+    });
+  }
+
+  function positions(){
+    const w = ROOM.width, d = ROOM.depth;
+    const inset = 0.05;
+    return [
+      { wall:'north', pos:{x:-3.2, z:-d/2+inset}, lightPos:{x:-3.2, z:-d/2+1.2}, rotY:0 },
+      { wall:'north', pos:{x: 3.2, z:-d/2+inset}, lightPos:{x: 3.2, z:-d/2+1.2}, rotY:0 },
+      { wall:'west',  pos:{x:-w/2+inset, z:0}, lightPos:{x:-w/2+1.2, z:0}, rotY:Math.PI/2 },
+      { wall:'east',  pos:{x: w/2-inset, z:0}, lightPos:{x: w/2-1.2, z:0}, rotY:-Math.PI/2 },
+    ];
+  }
+
+  function buildArtworks(){
+    const loader = new THREE.TextureLoader();
+    const layout = positions();
+
+    ARTWORKS.forEach((art, i) => {
+      const p = layout[i];
+      const frameW = 1.7, frameH = 2.15;
+
+      const frameGroup = new THREE.Group();
+
+      const frameMat = new THREE.MeshStandardMaterial({ color: 0x2A2320, roughness:0.5, metalness:0.2 });
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(frameW + 0.14, frameH + 0.14, 0.06), frameMat);
+      frameGroup.add(frame);
+
+      const placeholderMat = new THREE.MeshStandardMaterial({ color: 0xD8CFC0, roughness:0.9 });
+      const canvasMesh = new THREE.Mesh(new THREE.PlaneGeometry(frameW, frameH), placeholderMat);
+      canvasMesh.position.z = 0.035;
+      canvasMesh.userData = { title: art.title, artist: art.artist, tech: art.tech, isPainting: true };
+      frameGroup.add(canvasMesh);
+      paintingMeshes.push(canvasMesh);
+
+      loader.load(art.img, (tex) => {
+        canvasMesh.material = new THREE.MeshStandardMaterial({ map: tex, roughness:0.85 });
+      });
+
+      // pequeña placa con el título, orientada como el cuadro
+      frameGroup.position.set(p.pos.x, EYE_HEIGHT + 0.15, p.pos.z);
+      frameGroup.rotation.y = p.rotY;
+      scene.add(frameGroup);
+    });
+  }
+
+  function requestPointerLock(){
+    renderer.domElement.requestPointerLock();
+  }
+
+  function onPointerLockChange(){
+    pointerLocked = document.pointerLockElement === renderer.domElement;
+    if(!pointerLocked){
+      startEl.classList.remove('hidden');
+    }
+  }
+
+  function onMouseMove(e){
+    if(!pointerLocked) return;
+    const sensitivity = 0.0022;
+    yaw -= e.movementX * sensitivity;
+    pitch -= e.movementY * sensitivity;
+    pitch = Math.max(-1.2, Math.min(1.2, pitch));
+  }
+
+  function onKeyDown(e){
+    switch(e.code){
+      case 'KeyW': keys.w = true; break;
+      case 'KeyA': keys.a = true; break;
+      case 'KeyS': keys.s = true; break;
+      case 'KeyD': keys.d = true; break;
+    }
+  }
+  function onKeyUp(e){
+    switch(e.code){
+      case 'KeyW': keys.w = false; break;
+      case 'KeyA': keys.a = false; break;
+      case 'KeyS': keys.s = false; break;
+      case 'KeyD': keys.d = false; break;
+    }
+  }
+
+  function onResize(){
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  function updateMovement(dt){
+    camera.rotation.set(0,0,0);
+    camera.rotation.order = 'YXZ';
+    camera.rotation.y = yaw;
+    camera.rotation.x = pitch;
+
+    const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).negate();
+    const right = new THREE.Vector3(Math.sin(yaw + Math.PI/2), 0, Math.cos(yaw + Math.PI/2)).negate();
+
+    velocity.set(0,0,0);
+    if(keys.w) velocity.add(forward);
+    if(keys.s) velocity.add(forward.clone().negate());
+    if(keys.a) velocity.add(right.clone().negate());
+    if(keys.d) velocity.add(right);
+
+    if(velocity.lengthSq() > 0){
+      velocity.normalize().multiplyScalar(MOVE_SPEED * dt);
+      const nx = camera.position.x + velocity.x;
+      const nz = camera.position.z + velocity.z;
+
+      const limX = ROOM.width/2 - MARGIN;
+      const limZ = ROOM.depth/2 - MARGIN;
+
+      camera.position.x = Math.max(-limX, Math.min(limX, nx));
+      camera.position.z = Math.max(-limZ, Math.min(limZ, nz));
+    }
+    camera.position.y = EYE_HEIGHT;
+  }
+
+  function updateFocusedPainting(){
+    raycaster.setFromCamera({x:0, y:0}, camera);
+    const hits = raycaster.intersectObjects(paintingMeshes);
+    if(hits.length > 0 && hits[0].distance < LOOK_RANGE){
+      const data = hits[0].object.userData;
+      if(activePainting !== hits[0].object){
+        activePainting = hits[0].object;
+        capArtist.textContent = data.artist;
+        capTitle.textContent = data.title;
+        capTech.textContent = data.tech;
+        captionEl.classList.add('show');
+      }
+    } else if(activePainting){
+      activePainting = null;
+      captionEl.classList.remove('show');
+    }
+  }
+
+  function animate(){
+    requestAnimationFrame(animate);
+    const dt = Math.min(clock.getDelta(), 0.05);
+    if(pointerLocked) updateMovement(dt);
+    updateFocusedPainting();
+    renderer.render(scene, camera);
+  }
+})();
+</script>
+</body>
+</html>
