@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gallery24 · Sala 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wine:#6E1F3E;
+    --wine-deep:#4E1530;
+    --paper:#FBFAF7;
+    --ink:#211D19;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; overflow:hidden; background:#0c0b0a; font-family:system-ui,sans-serif; touch-action:none; }
+  canvas{ display:block; width:100%; height:100%; }
+
+  /* ---------- Loading Screen (liquid glass) ---------- */
+  #loadingScreen{
+    position:fixed; inset:0; z-index:100;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(165deg, #2A0C1B 0%, #160810 55%, #0a0608 100%);
+    color:var(--paper);
+    transition: opacity 0.7s ease, visibility 0.7s ease;
+  }
+  #loadingScreen.loaded{
+    opacity:0; visibility:hidden; pointer-events:none;
+  }
+  #loadingScreen::before{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(110,31,62,0.35), transparent 60%);
+    pointer-events:none;
+  }
+  .loading-content{ text-align:center; position:relative; width:min(380px,86vw); }
+  .loading-logo{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:#C7A44F; margin-bottom:18px;
+  }
+  .loading-title{
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:1.6rem; margin-bottom:10px;
+  }
+  #loadingMessage{
+    font-size:0.85rem; opacity:0.7; margin-bottom:28px; line-height:1.5;
+  }
+  .loading-bar{
+    width:100%; height:4px; border-radius:99px;
+    background:rgba(255,255,255,0.12); overflow:hidden;
+  }
+  #loadingProgress{
+    height:100%; width:0%; border-radius:inherit;
+    background: linear-gradient(90deg, #C7A44F, #e8d5a3);
+    transition: width 0.35s ease;
+  }
+  #loadingPercent{
+    margin-top:12px; font-family:'IBM Plex Mono', monospace;
+    font-size:0.65rem; opacity:0.5; letter-spacing:0.06em;
+  }
+
+  /* ---------- WebGL Error ---------- */
+  #webglError{
+    position:fixed; inset:0; z-index:110;
+    display:none; align-items:center; justify-content:center;
+    background:#0a0608; color:var(--paper); text-align:center; padding:32px;
+  }
+  #webglError.visible{ display:flex; }
+  #webglError h2{
+    font-family:'Fraunces', serif; font-style:italic; font-size:1.8rem; margin-bottom:14px;
+  }
+  #webglError p{ opacity:0.7; max-width:32ch; line-height:1.6; margin:0 auto 28px; }
+  #webglError a{
+    display:inline-block; font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    background:var(--paper); color:var(--wine-deep);
+    padding:14px 28px; border-radius:999px; text-decoration:none;
+  }
+
+  /* ---------- Liquid Glass UI ---------- */
+  #topbar{
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 20px; pointer-events:none;
+  }
+  #topbar a, #roomLabel{
+    pointer-events:auto;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    background: linear-gradient(135deg, rgba(251,250,247,0.16), rgba(251,250,247,0.05));
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.2);
+    color: var(--paper);
+    border-radius: 999px;
+    text-decoration:none;
+  }
+  #topbar a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em;
+    padding:10px 18px;
+  }
+  #roomLabel{
+    font-family:'Fraunces', serif; font-style:italic;
+    padding:10px 20px; font-size:0.92rem;
+  }
+
+  #crosshair{
+    position:fixed; top:50%; left:50%; width:4px; height:4px;
+    transform:translate(-50%,-50%); border-radius:50%;
+    background:rgba(255,255,255,0.85); z-index:15; display:none;
+    box-shadow:0 0 6px rgba(255,255,255,0.5);
+  }
+
+  #startOverlay{
+    position:fixed; inset:0; z-index:30;
+    background: linear-gradient(165deg, #2A0C1B 0%, #160810 55%, #0a0608 100%);
+    color:var(--paper);
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:28px;
+  }
+  #startOverlay.visible{ display:flex; }
+  #startOverlay::before{
+    content:''; position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 28%, rgba(110,31,62,0.32), transparent 58%);
+    pointer-events:none;
+  }
+  #startOverlay h1{
+    font-family:'Fraunces', serif; font-size:clamp(1.7rem,5vw,2.3rem);
+    font-style:italic; max-width:15ch; position:relative;
+  }
+  #startOverlay p{
+    margin-top:16px; max-width:34ch; opacity:0.82;
+    font-size:0.92rem; line-height:1.6; position:relative;
+  }
+  #startBtn{
+    margin-top:32px; font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.11em;
+    background:var(--paper); color:var(--wine-deep);
+    border:none; padding:15px 34px; border-radius:999px; cursor:pointer;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.3);
+    transition: transform 0.18s;
+    position:relative;
+  }
+  #startBtn:active{ transform:scale(0.97); }
+  #controlsHint{
+    margin-top:18px; font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem; opacity:0.5; letter-spacing:0.04em; position:relative;
+  }
+
+  /* ---------- Artwork Info (proximity + selection) ---------- */
+  #artInfo{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    z-index:20; max-width:min(88vw,400px);
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+    background: linear-gradient(160deg, rgba(251,250,247,0.92), rgba(251,250,247,0.78));
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.65);
+    color:var(--ink); padding:16px 26px; border-radius:22px;
+    text-align:center; display:none;
+    transition: opacity 0.25s ease;
+  }
+  #artInfo .t{ font-family:'Fraunces', serif; font-style:italic; font-size:1.05rem; }
+  #artInfo .m{
+    font-family:'IBM Plex Mono', monospace; font-size:0.6rem;
+    text-transform:uppercase; letter-spacing:0.06em; color:var(--wine); margin-top:5px;
+  }
+  #artInfo .hint{
+    font-family:'IBM Plex Mono', monospace; font-size:0.55rem;
+    opacity:0.45; margin-top:8px; letter-spacing:0.04em;
+  }
+
+  /* Panel completo al seleccionar */
+  #artworkPanel{
+    position:fixed; z-index:25;
+    right:24px; bottom:24px;
+    width:min(340px, calc(100vw - 40px));
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    background: linear-gradient(160deg, rgba(251,250,247,0.95), rgba(251,250,247,0.85));
+    border: 1px solid rgba(255,255,255,0.55);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+    color:var(--ink); padding:22px 24px; border-radius:22px;
+    transform: translateY(16px); opacity:0; pointer-events:none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  #artworkPanel.visible{
+    transform: translateY(0); opacity:1; pointer-events:auto;
+  }
+  #artworkPanel .label{
+    font-family:'IBM Plex Mono', monospace; font-size:0.58rem;
+    text-transform:uppercase; letter-spacing:0.12em; color:var(--wine); opacity:0.7;
+  }
+  #artworkPanel .title{
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:1.25rem; margin:8px 0 6px;
+  }
+  #artworkPanel .artist{
+    font-size:0.9rem; font-weight:500; margin-bottom:4px;
+  }
+  #artworkPanel .tech{
+    font-family:'IBM Plex Mono', monospace; font-size:0.62rem;
+    opacity:0.55; letter-spacing:0.04em;
+  }
+  #closePanel{
+    position:absolute; top:12px; right:14px;
+    border:none; background:none; color:var(--ink);
+    font-size:1.4rem; cursor:pointer; opacity:0.5; line-height:1;
+  }
+  #closePanel:hover{ opacity:0.9; }
+
+  /* Mobile controls */
+  #mobileControls{ display:none; position:fixed; inset:0; z-index:18; pointer-events:none; }
+  #joystickZone{
+    position:absolute; bottom:36px; left:24px;
+    width:120px; height:120px; border-radius:50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    pointer-events:auto;
+  }
+  #joystickKnob{
+    position:absolute; width:48px; height:48px; border-radius:50%;
+    background: rgba(251,250,247,0.82);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    top:50%; left:50%; transform:translate(-50%,-50%);
+  }
+  #lookHint{
+    position:absolute; bottom:44px; right:24px;
+    font-family:'IBM Plex Mono', monospace; font-size:0.58rem;
+    color:rgba(255,255,255,0.4); letter-spacing:0.05em;
+    text-transform:uppercase; pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loadingScreen">
+  <div class="loading-content">
+    <div class="loading-logo">Gallery24 · Experience</div>
+    <div class="loading-title">Preparando la exposición</div>
+    <div id="loadingMessage">Inicializando experiencia 3D…</div>
+    <div class="loading-bar"><div id="loadingProgress"></div></div>
+    <div id="loadingPercent">0%</div>
+  </div>
+</div>
+
+<!-- WebGL Error -->
+<div id="webglError">
+  <div>
+    <h2>Gallery24 3D</h2>
+    <p>Tu dispositivo no puede ejecutar correctamente esta experiencia 3D.</p>
+    <a href="inicio.html">Continuar en Gallery24</a>
+  </div>
+</div>
+
+<!-- Start Overlay -->
+<div id="startOverlay">
+  <span style="font-family:'IBM Plex Mono',monospace;font-size:0.68rem;letter-spacing:0.11em;text-transform:uppercase;color:#C7A44F;position:relative;">Gallery24 · Experience</span>
+  <h1 style="margin-top:14px;">Camina por el museo</h1>
+  <p>Espacio realista. WASD + mouse en escritorio. En móvil: joystick + arrastra para mirar. Haz clic en una obra para ver su ficha.</p>
+  <button id="startBtn">Entrar a la sala →</button>
+  <span id="controlsHint">ESC libera el mouse · Clic en obra para seleccionar</span>
+</div>
+
+<div id="topbar">
+  <a href="inicio.html">← Salir</a>
+  <span id="roomLabel">Sala 1</span>
+  <span style="width:64px;"></span>
+</div>
+
+<div id="crosshair"></div>
+
+<!-- Proximity info (subtle) -->
+<div id="artInfo">
+  <div class="t" id="artTitle"></div>
+  <div class="m" id="artMeta"></div>
+  <div class="hint">Clic para más información</div>
+</div>
+
+<!-- Full artwork panel (on select) -->
+<div id="artworkPanel">
+  <button id="closePanel" aria-label="Cerrar">×</button>
+  <div class="label">Obra seleccionada</div>
+  <div class="title" id="panelTitle">—</div>
+  <div class="artist" id="panelArtist">—</div>
+  <div class="tech" id="panelTech">—</div>
+</div>
+
+<div id="mobileControls">
+  <div id="joystickZone"><div id="joystickKnob"></div></div>
+  <div id="lookHint">Arrastra para mirar</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// =========================================================
+// WEBGL CHECK
+// =========================================================
+function isWebGLAvailable() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+  } catch (e) { return false; }
+}
+if (!isWebGLAvailable()) {
+  document.getElementById('webglError').classList.add('visible');
+  document.getElementById('loadingScreen').style.display = 'none';
+  throw new Error('WebGL no disponible');
+}
+
+// =========================================================
+// LOADING SYSTEM
+// =========================================================
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingProgress = document.getElementById('loadingProgress');
+const loadingPercent = document.getElementById('loadingPercent');
+const loadingMessage = document.getElementById('loadingMessage');
+
+function updateLoading(progress, message) {
+  const v = Math.max(0, Math.min(100, progress));
+  loadingProgress.style.width = v + '%';
+  loadingPercent.textContent = Math.round(v) + '%';
+  if (message) loadingMessage.textContent = message;
+}
+function finishLoading() {
+  updateLoading(100, 'Exposición preparada');
+  setTimeout(() => loadingScreen.classList.add('loaded'), 600);
+}
+
+updateLoading(8, 'Inicializando motor 3D…');
+
+// =========================================================
+// RENDERER
+// =========================================================
+const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 900);
+
+const renderer = new THREE.WebGLRenderer({
+  antialias: !isMobile,
+  powerPreference: 'high-performance',
+  stencil: false,
+  depth: true
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.12;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+document.body.appendChild(renderer.domElement);
+
+updateLoading(18, 'Preparando entorno…');
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+pmrem.dispose();
+
+// =========================================================
+// SCENE
+// =========================================================
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xf2efe8);
+scene.environment = envMap;
+scene.fog = new THREE.Fog(0xf2efe8, 20, 52);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 70);
+camera.position.set(4.8, 1.65, 6.2);
+
+updateLoading(28, 'Configurando iluminación…');
+
+// =========================================================
+// LIGHTING
+// =========================================================
+const hemi = new THREE.HemisphereLight(0xfff8f0, 0xc4b8a8, 0.72);
+scene.add(hemi);
+
+const sun = new THREE.DirectionalLight(0xfff5e8, 1.55);
+sun.position.set(4.5, 17, 2.5);
+sun.castShadow = true;
+sun.shadow.mapSize.set(isMobile ? 512 : 1024, isMobile ? 512 : 1024);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 36;
+sun.shadow.camera.left = -16;
+sun.shadow.camera.right = 16;
+sun.shadow.camera.top = 14;
+sun.shadow.camera.bottom = -8;
+sun.shadow.bias = -0.0003;
+scene.add(sun);
+
+[5.5, 17.5, 29.5].forEach((x) => {
+  const p = new THREE.PointLight(0xfff0dc, 0.75, 13, 1.45);
+  p.position.set(x, 3.7, 5.5);
+  scene.add(p);
+});
+
+const fill = new THREE.PointLight(0xe8e0d4, 0.35, 18, 2);
+fill.position.set(18.5, 2.8, 6);
+scene.add(fill);
+
+updateLoading(40, 'Creando materiales…');
+
+// =========================================================
+// MATERIALS
+// =========================================================
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xf5f1e9, roughness: 0.88, metalness: 0.0, envMapIntensity: 0.5 });
+const floorLightMat = new THREE.MeshStandardMaterial({ color: 0xe8e3d5, roughness: 0.52, metalness: 0.04, envMapIntensity: 0.6 });
+const floorDarkMat = new THREE.MeshPhysicalMaterial({
+  color: 0x11100f, roughness: 0.14, metalness: 0.38,
+  clearcoat: 1.0, clearcoatRoughness: 0.08, envMapIntensity: 1.35
+});
+const glassMat = new THREE.MeshPhysicalMaterial({
+  color: 0xf8fcff, metalness: 0, roughness: 0.03, transmission: 0.93,
+  thickness: 0.55, ior: 1.52, envMapIntensity: 1.45,
+  transparent: true, side: THREE.DoubleSide, depthWrite: false
+});
+const woodMat = new THREE.MeshStandardMaterial({ color: 0x4c3628, roughness: 0.62, metalness: 0.07 });
+const pedestalMat = new THREE.MeshStandardMaterial({ color: 0xf8f4ec, roughness: 0.38, metalness: 0.03 });
+const frameMat = new THREE.MeshStandardMaterial({ color: 0x25201b, roughness: 0.42, metalness: 0.14 });
+
+updateLoading(52, 'Construyendo arquitectura…');
+
+// =========================================================
+// ARCHITECTURE
+// =========================================================
+const TOTAL = 38;
+const DEPTH = 11.5;
+const HEIGHT = 4.2;
+const wallBoxes = [];
+
+function addBox(x, y, z, w, h, d, mat, castShadow = true) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.position.set(x, y, z);
+  m.castShadow = castShadow;
+  m.receiveShadow = true;
+  scene.add(m);
+  if (mat !== glassMat) wallBoxes.push(new THREE.Box3().setFromObject(m));
+  return m;
+}
+
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(TOTAL, DEPTH), floorLightMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.set(TOTAL / 2, 0, DEPTH / 2);
+floor.receiveShadow = true;
+scene.add(floor);
+
+const darkFloor = new THREE.Mesh(new THREE.PlaneGeometry(12.5, DEPTH - 0.4), floorDarkMat);
+darkFloor.rotation.x = -Math.PI / 2;
+darkFloor.position.set(18.5, 0.015, DEPTH / 2);
+darkFloor.receiveShadow = true;
+scene.add(darkFloor);
+
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(TOTAL, DEPTH), wallMat);
+ceiling.rotation.x = Math.PI / 2;
+ceiling.position.set(TOTAL / 2, HEIGHT, DEPTH / 2);
+scene.add(ceiling);
+
+const skylight = new THREE.Mesh(new THREE.PlaneGeometry(14, 6.2), new THREE.MeshBasicMaterial({ color: 0xfffaf3 }));
+skylight.rotation.x = Math.PI / 2;
+skylight.position.set(7, HEIGHT - 0.02, 5.8);
+scene.add(skylight);
+
+addBox(TOTAL / 2, HEIGHT / 2, 0.12, TOTAL, HEIGHT, 0.24, wallMat, false);
+addBox(TOTAL / 2, HEIGHT / 2, DEPTH - 0.12, TOTAL, HEIGHT, 0.24, wallMat, false);
+addBox(0.12, HEIGHT / 2, DEPTH / 2, 0.24, HEIGHT, DEPTH, wallMat, false);
+addBox(TOTAL - 0.12, HEIGHT / 2, DEPTH / 2, 0.24, HEIGHT, DEPTH, wallMat, false);
+
+function addGlassPartition(x) {
+  addBox(x, HEIGHT / 2, 1.7, 0.2, HEIGHT, 3.2, wallMat);
+  addBox(x, HEIGHT / 2, DEPTH - 1.7, 0.2, HEIGHT, 3.2, wallMat);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(0.07, HEIGHT - 0.5, 4.0), glassMat);
+  glass.position.set(x, HEIGHT / 2 - 0.1, DEPTH / 2);
+  scene.add(glass);
+}
+addGlassPartition(12.3);
+addGlassPartition(24.8);
+
+addBox(11.6, HEIGHT / 2, 0.4, 0.38, HEIGHT, 0.65, woodMat);
+
+const windowGlass = new THREE.Mesh(
+  new THREE.PlaneGeometry(8.5, 3.4),
+  new THREE.MeshPhysicalMaterial({
+    color: 0xe8f2f8, metalness: 0, roughness: 0.03, transmission: 0.9,
+    thickness: 0.3, ior: 1.5, envMapIntensity: 1.2,
+    transparent: true, side: THREE.DoubleSide, depthWrite: false
+  })
+);
+windowGlass.position.set(TOTAL - 0.3, 2.1, DEPTH / 2);
+windowGlass.rotation.y = -Math.PI / 2;
+scene.add(windowGlass);
+addBox(TOTAL - 0.22, 2.1, DEPTH / 2, 0.12, 3.6, 9.0, wallMat, false);
+
+updateLoading(68, 'Colgando obras…');
+
+// =========================================================
+// ARTWORKS + SCULPTURES
+// =========================================================
+// LoadingManager: ata la barra de progreso a la descarga real de las imágenes
+const loadingManager = new THREE.LoadingManager();
+const texLoader = new THREE.TextureLoader(loadingManager);
+const artworkMeshes = []; // for raycasting
+const artHitboxes = [];
+
+loadingManager.onProgress = (url, loaded, total) => {
+  const pct = 68 + (loaded / total) * 28; // 68% → 96% mientras descargan las obras
+  updateLoading(pct, `Cargando obras (${loaded}/${total})…`);
+};
+loadingManager.onLoad = () => {
+  finishLoading();
+};
+
+const artworksData = [
+  { x: 3.8,  z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24a/560/700', title: 'Cartagena Eterna',   artist: 'Camila Restrepo', technique: 'Óleo sobre lienzo' },
+  { x: 8.2,  z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24b/560/700', title: 'Lo que Permanece',  artist: 'Julián Ortega',   technique: 'Fotografía' },
+  { x: 6.0,  z: 11.25, ry: Math.PI, url: 'https://picsum.photos/seed/g24c/560/700', title: 'Raíces',            artist: 'Mariana Duque',   technique: 'Técnica mixta' },
+  { x: 15.8, z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24d/560/700', title: 'Mural Urbano',      artist: 'Esteban Ríos',    technique: 'Arte urbano' },
+  { x: 20.6, z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24e/560/700', title: 'Costa Adentro',     artist: 'Camila Restrepo', technique: 'Pintura' },
+  { x: 18.2, z: 11.25, ry: Math.PI, url: 'https://picsum.photos/seed/g24f/560/700', title: 'Retrato Silente',   artist: 'Daniela Cano',    technique: 'Fotografía' },
+  { x: 28.0, z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24g/560/700', title: 'Territorio',        artist: 'Andrés Pardo',    technique: 'Arte digital' },
+  { x: 33.2, z: 0.25, ry: 0,        url: 'https://picsum.photos/seed/g24h/560/700', title: 'Memoria Viva',      artist: 'Julián Ortega',   technique: 'Video-arte' },
+];
+
+artworksData.forEach((art) => {
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(1.9, 2.45, 0.08), frameMat);
+  frame.position.set(art.x, 1.95, art.z);
+  frame.rotation.y = art.ry;
+  frame.castShadow = true;
+  frame.userData.artwork = art;
+  scene.add(frame);
+  artworkMeshes.push(frame);
+
+  const tex = texLoader.load(art.url);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const canvas = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.6, 2.1),
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 0.72, metalness: 0 })
+  );
+  const off = art.ry === 0 ? 0.05 : -0.05;
+  canvas.position.set(art.x + Math.sin(art.ry) * off, 1.95, art.z + Math.cos(art.ry) * off);
+  canvas.rotation.y = art.ry;
+  canvas.userData.artwork = art;
+  scene.add(canvas);
+  artworkMeshes.push(canvas);
+
+  artHitboxes.push({ x: art.x, z: art.z, title: art.title, meta: art.artist + ' · ' + art.technique, data: art });
+});
+
+function addSculpture(x, z, color) {
+  const ped = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.88, 0.68), pedestalMat);
+  ped.position.set(x, 0.44, z);
+  ped.castShadow = true;
+  ped.receiveShadow = true;
+  scene.add(ped);
+
+  const sc = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.3, 0),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.32, metalness: 0.12, envMapIntensity: 0.7 })
+  );
+  sc.position.set(x, 1.22, z);
+  sc.castShadow = true;
+  scene.add(sc);
+}
+addSculpture(2.4, 3.3, 0xb5a28e);
+addSculpture(9.0, 8.0, 0xcfc0ad);
+addSculpture(14.8, 4.0, 0xa48c74);
+addSculpture(26.5, 8.2, 0xc4b39e);
+
+const bench = new THREE.Mesh(new THREE.BoxGeometry(1.85, 0.4, 0.52), woodMat);
+bench.position.set(18.5, 0.2, 8.0);
+bench.castShadow = true;
+scene.add(bench);
+
+updateLoading(82, 'Preparando etiquetas…');
+
+// Labels
+function makeLabel(text) {
+  const c = document.createElement('canvas');
+  c.width = 480; c.height = 112;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = 'rgba(78,21,48,0.8)';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 480, 112, 24);
+  ctx.fill();
+  ctx.fillStyle = '#FBFAF7';
+  ctx.font = 'italic 44px Georgia';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 240, 56);
+  const tex = new THREE.CanvasTexture(c);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+  sprite.scale.set(2.5, 0.58, 1);
+  return sprite;
+}
+const roomNames = ['Cartagena Eterna', 'Arte Urbano', 'Territorios Digitales'];
+[6.0, 18.5, 30.5].forEach((x, i) => {
+  const s = makeLabel(roomNames[i]);
+  s.position.set(x, 3.5, DEPTH / 2);
+  scene.add(s);
+});
+
+updateLoading(90, 'Configurando controles…');
+
+// =========================================================
+// CONTROLS
+// =========================================================
+const controls = new PointerLockControls(camera, document.body);
+
+const startOverlay = document.getElementById('startOverlay');
+const startBtn = document.getElementById('startBtn');
+const crosshair = document.getElementById('crosshair');
+const roomLabelEl = document.getElementById('roomLabel');
+const artInfoEl = document.getElementById('artInfo');
+const artTitleEl = document.getElementById('artTitle');
+const artMetaEl = document.getElementById('artMeta');
+const mobileControls = document.getElementById('mobileControls');
+const artworkPanel = document.getElementById('artworkPanel');
+const panelTitle = document.getElementById('panelTitle');
+const panelArtist = document.getElementById('panelArtist');
+const panelTech = document.getElementById('panelTech');
+const closePanel = document.getElementById('closePanel');
+
+startBtn.addEventListener('click', () => {
+  if (isMobile) {
+    startOverlay.classList.remove('visible');
+    mobileControls.style.display = 'block';
+  } else {
+    controls.lock();
+  }
+});
+
+controls.addEventListener('lock', () => {
+  startOverlay.classList.remove('visible');
+  crosshair.style.display = 'block';
+});
+controls.addEventListener('unlock', () => {
+  startOverlay.classList.add('visible');
+  crosshair.style.display = 'none';
+});
+
+// Keyboard
+const move = { f: false, b: false, l: false, r: false };
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp')    move.f = true;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown')  move.b = true;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft')  move.l = true;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') move.r = true;
+});
+document.addEventListener('keyup', e => {
+  if (e.code === 'KeyW' || e.code === 'ArrowUp')    move.f = false;
+  if (e.code === 'KeyS' || e.code === 'ArrowDown')  move.b = false;
+  if (e.code === 'KeyA' || e.code === 'ArrowLeft')  move.l = false;
+  if (e.code === 'KeyD' || e.code === 'ArrowRight') move.r = false;
+});
+
+// Joystick
+const zone = document.getElementById('joystickZone');
+const knob = document.getElementById('joystickKnob');
+let joy = { active: false, x: 0, y: 0 };
+const maxR = 34;
+
+function setKnob(dx, dy) {
+  const len = Math.hypot(dx, dy);
+  const k = len > maxR ? maxR / len : 1;
+  joy.x = (dx * k) / maxR;
+  joy.y = (dy * k) / maxR;
+  knob.style.transform = `translate(calc(-50% + ${dx * k}px), calc(-50% + ${dy * k}px))`;
+}
+
+zone.addEventListener('touchstart', e => {
+  e.preventDefault();
+  joy.active = true;
+  const t = e.touches[0];
+  const r = zone.getBoundingClientRect();
+  setKnob(t.clientX - r.left - r.width / 2, t.clientY - r.top - r.height / 2);
+}, { passive: false });
+zone.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!joy.active) return;
+  const t = e.touches[0];
+  const r = zone.getBoundingClientRect();
+  setKnob(t.clientX - r.left - r.width / 2, t.clientY - r.top - r.height / 2);
+}, { passive: false });
+zone.addEventListener('touchend', () => {
+  joy.active = false; joy.x = 0; joy.y = 0;
+  knob.style.transform = 'translate(-50%, -50%)';
+});
+
+// Touch look
+let lookId = null, lastX = 0, lastY = 0;
+const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+
+renderer.domElement.addEventListener('touchstart', e => {
+  if (e.touches.length === 1 && !joy.active) {
+    lookId = e.touches[0].identifier;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  }
+}, { passive: true });
+renderer.domElement.addEventListener('touchmove', e => {
+  for (const t of e.touches) {
+    if (t.identifier === lookId) {
+      const dx = t.clientX - lastX;
+      const dy = t.clientY - lastY;
+      lastX = t.clientX; lastY = t.clientY;
+      euler.setFromQuaternion(camera.quaternion);
+      euler.y -= dx * 0.0038;
+      euler.x -= dy * 0.0038;
+      euler.x = Math.max(-1.35, Math.min(1.35, euler.x));
+      camera.quaternion.setFromEuler(euler);
+    }
+  }
+}, { passive: true });
+renderer.domElement.addEventListener('touchend', e => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === lookId) lookId = null;
+  }
+});
+
+// =========================================================
+// RAYCASTER SELECTION
+// =========================================================
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function selectArtwork(clientX, clientY) {
+  mouse.x = (clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(artworkMeshes, false);
+  if (!hits.length) return;
+
+  const art = hits[0].object.userData.artwork;
+  if (!art) return;
+
+  panelTitle.textContent = art.title;
+  panelArtist.textContent = art.artist;
+  panelTech.textContent = art.technique;
+  artworkPanel.classList.add('visible');
+}
+
+// Distingue un "tap/clic" real de un gesto de arrastre (mirar alrededor),
+// para no abrir el panel de la obra cada vez que el usuario mueve la cámara.
+let pointerDownPos = null;
+let pointerDownTime = 0;
+const TAP_MAX_MOVE = 10;   // px de tolerancia
+const TAP_MAX_TIME = 350;  // ms de tolerancia
+
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  if (isMobile && joy.active) return;
+  pointerDownPos = { x: e.clientX, y: e.clientY };
+  pointerDownTime = performance.now();
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (isMobile && joy.active) return;
+  if (!pointerDownPos) return;
+
+  const moved = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+  const elapsed = performance.now() - pointerDownTime;
+  pointerDownPos = null;
+  if (moved > TAP_MAX_MOVE || elapsed > TAP_MAX_TIME) return; // fue un arrastre, no un tap
+
+  if (!isMobile && controls.isLocked) {
+    // Con el puntero bloqueado, clientX/clientY no son fiables entre navegadores:
+    // raycastear siempre desde el centro de pantalla (el crosshair).
+    selectArtwork(window.innerWidth / 2, window.innerHeight / 2);
+  } else {
+    selectArtwork(e.clientX, e.clientY);
+  }
+});
+
+closePanel.addEventListener('click', () => {
+  artworkPanel.classList.remove('visible');
+});
+
+// =========================================================
+// MOVEMENT + PROXIMITY UI
+// =========================================================
+const PLAYER_R = 0.36;
+const SPEED = 3.5;
+const clock = new THREE.Clock();
+
+function tryMove(dx, dz) {
+  const pos = camera.position;
+  const nx = pos.x + dx;
+  const nz = pos.z + dz;
+
+  const boxX = new THREE.Box3(
+    new THREE.Vector3(nx - PLAYER_R, 0.15, pos.z - PLAYER_R),
+    new THREE.Vector3(nx + PLAYER_R, 1.85, pos.z + PLAYER_R)
+  );
+  if (!wallBoxes.some(b => b.intersectsBox(boxX))) pos.x = nx;
+
+  const boxZ = new THREE.Box3(
+    new THREE.Vector3(pos.x - PLAYER_R, 0.15, nz - PLAYER_R),
+    new THREE.Vector3(pos.x + PLAYER_R, 1.85, nz + PLAYER_R)
+  );
+  if (!wallBoxes.some(b => b.intersectsBox(boxZ))) pos.z = nz;
+}
+
+function updateUI() {
+  const x = camera.position.x;
+  const idx = x < 12.3 ? 0 : x < 24.8 ? 1 : 2;
+  roomLabelEl.textContent = `Sala ${idx + 1} — ${roomNames[idx]}`;
+
+  // Proximity (subtle)
+  let nearest = null, dist = 2.7;
+  for (const a of artHitboxes) {
+    const d = Math.hypot(camera.position.x - a.x, camera.position.z - a.z);
+    if (d < dist) { dist = d; nearest = a; }
+  }
+  if (nearest && !artworkPanel.classList.contains('visible')) {
+    artTitleEl.textContent = nearest.title;
+    artMetaEl.textContent = nearest.meta;
+    artInfoEl.style.display = 'block';
+  } else {
+    artInfoEl.style.display = 'none';
+  }
+}
+
+// =========================================================
+// LOOP
+// =========================================================
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const speed = SPEED * dt;
+
+  let dx = 0, dz = 0;
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  dir.y = 0; dir.normalize();
+  const right = new THREE.Vector3(-dir.z, 0, dir.x);
+
+  if (isMobile) {
+    dx += dir.x * -joy.y * speed + right.x * joy.x * speed;
+    dz += dir.z * -joy.y * speed + right.z * joy.x * speed;
+  } else if (controls.isLocked) {
+    if (move.f) { dx += dir.x * speed; dz += dir.z * speed; }
+    if (move.b) { dx -= dir.x * speed; dz -= dir.z * speed; }
+    if (move.r) { dx += right.x * speed; dz += right.z * speed; }
+    if (move.l) { dx -= right.x * speed; dz -= right.z * speed; }
+  }
+
+  if (dx || dz) tryMove(dx, dz);
+  updateUI();
+  renderer.render(scene, camera);
+}
+
+// Start
+// finishLoading() se dispara solo cuando terminan de descargar las texturas (loadingManager.onLoad)
+setTimeout(() => {
+  startOverlay.classList.add('visible');
+}, 700);
+
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>
